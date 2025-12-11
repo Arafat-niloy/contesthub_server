@@ -22,3 +22,28 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+
+async function run() {
+  try {
+    // await client.connect();
+    const db = client.db("contestHubDB");
+    const userCollection = db.collection("users");
+    const contestCollection = db.collection("contests");
+    const paymentCollection = db.collection("payments");
+
+    // JWT Generator
+    app.post('/jwt', async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+      res.send({ token });
+    });
+
+    
+
+  } finally {}
+}
+run().catch(console.dir);
+
+app.listen(port, () => {
+  console.log(`ContestHub is sitting on port ${port}`);
+});

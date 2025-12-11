@@ -37,9 +37,36 @@ async function run() {
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
       res.send({ token });
     });
+// Verify Token Middleware
+    const verifyToken = (req, res, next) => {
+      if (!req.headers.authorization) return res.status(401).send({ message: 'forbidden access' });
+      const token = req.headers.authorization.split(' ')[1];
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) return res.status(401).send({ message: 'forbidden access' });
+        req.decoded = decoded;
+        next();
+      });
+    };
+
+    // Verify Admin Middleware
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      if (user?.role !== 'admin') return res.status(403).send({ message: 'forbidden access' });
+      next();
+    };
+
+    // Verify Creator Middleware
+    const verifyCreator = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      if (user?.role !== 'creator' && user?.role !== 'admin') return res.status(403).send({ message: 'forbidden access' });
+      next();
+    };
 
     
-
   } finally {}
 }
 run().catch(console.dir);

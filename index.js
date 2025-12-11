@@ -231,6 +231,21 @@ async function run() {
         res.send({ contestRes, paymentRes });
     });
 
+    app.get('/leaderboard', async(req, res) => {
+        const result = await paymentCollection.aggregate([
+            { $match: { isWinner: true } },
+            { $group: { _id: "$participantEmail", winCount: { $sum: 1 }, name: { $first: "$participantName" }, photo: { $first: "$participantPhoto" } } },
+            { $sort: { winCount: -1 } }
+        ]).toArray();
+        res.send(result);
+    });
+
+    app.get('/admin-stats', verifyToken, verifyAdmin, async(req, res) => {
+        const users = await userCollection.estimatedDocumentCount();
+        const contests = await contestCollection.estimatedDocumentCount();
+        res.send({ users, contests });
+    });
+
     
 
     

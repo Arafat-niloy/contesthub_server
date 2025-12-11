@@ -66,6 +66,49 @@ async function run() {
       next();
     };
 
+    // --- USERS API ---
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+      const query = { email: user.email };
+      const existingUser = await userCollection.findOne(query);
+      if (existingUser) return res.send({ message: 'user already exists', insertedId: null });
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+    });
+
+    app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get('/users/role/:email', verifyToken, async (req, res) => {
+      const email = req.params.email;
+      if (email !== req.decoded.email) return res.status(403).send({ message: 'unauthorized' });
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      res.send({ role: user?.role });
+    });
+
+    app.patch('/users/role/:id', verifyToken, verifyAdmin, async (req, res) => {
+        const id = req.params.id;
+        const role = req.body.role;
+        const filter = { _id: new ObjectId(id) };
+        const updatedDoc = { $set: { role: role } };
+        const result = await userCollection.updateOne(filter, updatedDoc);
+        res.send(result);
+    });
+
+    app.put('/users/:email', verifyToken, async (req, res) => {
+        const email = req.params.email;
+        const data = req.body;
+        const filter = { email: email };
+        const updatedDoc = { $set: { ...data } };
+        const result = await userCollection.updateOne(filter, updatedDoc);
+        res.send(result);
+    });
+
+    
+
     
   } finally {}
 }

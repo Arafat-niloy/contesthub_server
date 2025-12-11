@@ -191,6 +191,12 @@ async function run() {
         res.send({ paymentResult, contestResult });
     });
 
+    app.get('/payments/user/:email', verifyToken, async(req, res) => {
+        const email = req.params.email;
+        const result = await paymentCollection.find({participantEmail: email}).sort({date: -1}).toArray();
+        res.send(result);
+    });
+
     
 
     

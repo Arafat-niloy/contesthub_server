@@ -154,7 +154,20 @@ async function run() {
         res.send(result);
     });
 
-    
+    app.get('/contests/admin/all', verifyToken, verifyAdmin, async(req, res) => {
+        const result = await contestCollection.find().toArray();
+        res.send(result);
+    });
+
+    app.patch('/contests/status/:id', verifyToken, verifyAdmin, async(req, res) => {
+        const id = req.params.id;
+        const status = req.body.status;
+        const filter = { _id: new ObjectId(id) };
+        const updatedDoc = { $set: { status: status } };
+        const result = await contestCollection.updateOne(filter, updatedDoc);
+        res.send(result);
+    });
+
     
 
     

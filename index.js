@@ -128,6 +128,20 @@ async function run() {
         res.send(result);
     });
 
+    app.get('/contests/popular', async(req, res) => {
+        const result = await contestCollection.find({status: 'accepted'})
+        .sort({participationCount: -1})
+        .limit(6)
+        .toArray();
+        res.send(result);
+    })
+
+    app.get('/contests/:id', verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const result = await contestCollection.findOne({ _id: new ObjectId(id) });
+      res.send(result);
+    });
+
     
     
 

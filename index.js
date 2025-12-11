@@ -246,6 +246,9 @@ async function run() {
         res.send({ users, contests });
     });
 
+    app.get('/', (req, res) => {
+      res.send('ContestHub Server is Running');
+    });
     
 
     

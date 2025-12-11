@@ -216,7 +216,23 @@ async function run() {
         res.send(result);
     });
 
+    app.patch('/contests/winner/:id', verifyToken, verifyCreator, async(req, res) => {
+        const id = req.params.id;
+        const { winnerEmail, winnerName, winnerPhoto, submissionId } = req.body;
+        
+        const filter = { _id: new ObjectId(id) };
+        const updateContest = { $set: { winnerEmail, winnerName, winnerPhoto } };
+        const contestRes = await contestCollection.updateOne(filter, updateContest);
+
+        const paymentFilter = { _id: new ObjectId(submissionId) };
+        const updatePayment = { $set: { isWinner: true } };
+        const paymentRes = await paymentCollection.updateOne(paymentFilter, updatePayment);
+
+        res.send({ contestRes, paymentRes });
+    });
+
     
+
     
   } finally {}
 }

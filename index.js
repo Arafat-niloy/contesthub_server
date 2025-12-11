@@ -142,6 +142,18 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/contests/creator/:email', verifyToken, verifyCreator, async(req, res) => {
+        const email = req.params.email;
+        const result = await contestCollection.find({creatorEmail: email}).toArray();
+        res.send(result);
+    });
+
+    app.delete('/contests/:id', verifyToken, async (req, res) => {
+        const id = req.params.id;
+        const result = await contestCollection.deleteOne({ _id: new ObjectId(id) });
+        res.send(result);
+    });
+
     
     
 

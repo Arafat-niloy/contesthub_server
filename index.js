@@ -197,8 +197,26 @@ async function run() {
         res.send(result);
     });
 
-    
+    app.get('/submissions/creator/:email', verifyToken, verifyCreator, async(req, res) => {
+        const email = req.params.email;
+        const contests = await contestCollection.find({creatorEmail: email}).toArray();
+        const contestIds = contests.map(c => c._id.toString());
+        const query = { contestId: { $in: contestIds }, taskSubmitted: true }; 
+        
+        const submissions = await paymentCollection.find(query).toArray();
+        res.send(submissions);
+    });
 
+    app.patch('/payments/submit-task/:id', verifyToken, async(req, res) => {
+        const id = req.params.id;
+        const { taskUrl } = req.body;
+        const filter = { _id: new ObjectId(id) };
+        const updatedDoc = { $set: { taskUrl: taskUrl, taskSubmitted: true } };
+        const result = await paymentCollection.updateOne(filter, updatedDoc);
+        res.send(result);
+    });
+
+    
     
   } finally {}
 }

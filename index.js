@@ -107,6 +107,28 @@ async function run() {
         res.send(result);
     });
 
+    // --- CONTESTS API ---
+    app.post('/contests', verifyToken, verifyCreator, async (req, res) => {
+      const contest = req.body;
+      const result = await contestCollection.insertOne(contest);
+      res.send(result);
+    });
+
+    app.get('/contests', async (req, res) => {
+        const search = req.query.search || "";
+        const type = req.query.type || "";
+        let query = {
+            status: 'accepted',
+            contestName: { $regex: search, $options: 'i' }
+        };
+        if(type && type !== 'All') {
+            query.contestType = type;
+        }
+        const result = await contestCollection.find(query).toArray();
+        res.send(result);
+    });
+
+    
     
 
     

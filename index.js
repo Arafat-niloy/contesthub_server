@@ -168,6 +168,29 @@ async function run() {
         res.send(result);
     });
 
+    // --- PAYMENT & SUBMISSION ---
+    app.post('/create-payment-intent', verifyToken, async (req, res) => {
+      const { price } = req.body;
+      const amount = parseInt(price * 100);
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: 'usd',
+        payment_method_types: ['card']
+      });
+      res.send({ clientSecret: paymentIntent.client_secret });
+    });
+
+    app.post('/payments', verifyToken, async (req, res) => {
+        const payment = req.body;
+        const paymentResult = await paymentCollection.insertOne(payment);
+        
+        const filter = { _id: new ObjectId(payment.contestId) };
+        const updateDoc = { $inc: { participationCount: 1 } };
+        const contestResult = await contestCollection.updateOne(filter, updateDoc);
+
+        res.send({ paymentResult, contestResult });
+    });
+
     
 
     

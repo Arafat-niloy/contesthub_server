@@ -17,5 +17,13 @@
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.0.0",
     "stripe": "^20.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arafat-niloy/contesthub_server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Arafat-niloy/contesthub_server/issues"
+  },
+  "homepage": "https://github.com/Arafat-niloy/contesthub_server#readme"
 }
